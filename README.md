@@ -9,7 +9,7 @@ AGENTGUARD provides deterministic runtime guardrails, task-context aware interce
 
 ---
 
-## 🌟 Key Capabilities (Stages 01 – 03)
+## 🌟 Key Capabilities (Stages 01 – 04)
 
 - **FastAPI Core & Diagnostics (Stage 01)**: High-performance asynchronous API engine with health probes, database connectivity checks, and Pydantic v2 configuration management.
 - **Task Context Manager (Stage 02)**: Immutable task security boundaries defining allowed/denied action whitelists, entity restrictions, transaction limits, and expiration controls with deny-by-default semantics.
@@ -20,6 +20,9 @@ AGENTGUARD provides deterministic runtime guardrails, task-context aware interce
 - **Execution Gateway (Stage 03)**: Thread-safe dispatch boundary with atomic concurrency locking, duplicate execution prevention, single-use approval token replay protection, and fail-closed error handling.
 - **Trajectory Tracker & Anomaly Detector (Stage 03)**: Strict separation of proposed vs. executed actions, chronological action tracking, and automatic detection of suspicious action ordering, burst requests, and action repetition loops.
 - **Structured Security Event Emitter (Stage 03)**: Real-time, thread-safe audit event streaming covering all runtime decisions, anomalies, and execution outcomes.
+- **Execution Sandbox & Mock Services (Stage 04)**: Isolated in-memory environment providing synthetic accounts, vendors, invoices, payments, virtual filesystem, mock HTTP client, and mock database operations.
+- **Deterministic Fault Injection (Stage 04)**: Post-authorization tool-level simulation of network timeouts, HTTP rate limits (429), 5xx server errors, and payload corruption.
+- **Adversarial Scenarios & Regression Runner (Stage 04)**: Standardized benchmark catalog and automated trace replay runner with forensic verdict comparison.
 
 ---
 
@@ -61,8 +64,22 @@ AGENTGUARD/
 │   │   ├── interceptor.py        # ActionInterceptor & wrap_tool interface
 │   │   ├── monitoring.py         # MonitoringEngine & MonitoringDecision
 │   │   └── tracker.py            # TrajectoryTracker & workflow anomaly detector
-│   └── simulator/                # Virtual environment sandbox (Stage 04)
-│       └── __init__.py
+│   └── simulator/                # Execution sandbox & mock services (Stage 04)
+│       ├── __init__.py           # Simulator exports
+│       ├── models.py             # Synthetic accounts, vendors, invoices, payments
+│       ├── state.py              # Thread-safe in-memory SimulationState container
+│       ├── seed.py               # create_default_state() seed factory
+│       ├── sandbox.py            # SimulationSandbox with guarded tool wrappers
+│       ├── approval.py           # ApprovalService simulating human approvals
+│       ├── faults.py             # Deterministic FaultInjector & fault rules
+│       ├── scenarios.py          # AdversarialScenario catalog & builders
+│       ├── runner.py             # SandboxRunner for trace and scenario replay
+│       └── tools/                # Underlying tool implementations
+│           ├── __init__.py
+│           ├── banking.py        # Accounts, invoices, payments
+│           ├── filesystem.py     # Virtual sandboxed filesystem
+│           ├── http_client.py    # Mock HTTP request dispatcher
+│           └── database.py       # Mock database key-value operations
 ├── dashboard/                    # Streamlit operator dashboard
 │   ├── __init__.py
 │   └── app.py                    # Dashboard application entrypoint
@@ -71,13 +88,20 @@ AGENTGUARD/
 │   ├── conftest.py               # Shared fixtures & test client
 │   ├── api/
 │   │   ├── __init__.py
-│   │   └── test_health.py        # Endpoint status & schema validation
+│   │   └── test_health.py        # Endpoint status & schema validation (3 tests)
 │   ├── security/                 # Security, policy, monitoring & adversarial tests
 │   │   ├── __init__.py
 │   │   ├── test_context.py       # Context manager & approval registry tests (28 tests)
 │   │   ├── test_engine.py        # Policy engine & authorization rule tests (27 tests)
 │   │   ├── test_monitoring.py    # Monitoring engine & gateway tests (12 tests)
 │   │   └── test_adversarial.py   # Multi-threaded concurrency & race audit (13 tests)
+│   ├── simulator/                # Execution sandbox & environment tests (Stage 04)
+│   │   ├── __init__.py
+│   │   ├── test_banking.py       # Synthetic banking & approval workflow tests (4 tests)
+│   │   ├── test_filesystem.py    # Virtual filesystem & path traversal tests (3 tests)
+│   │   ├── test_http_database.py # Mock HTTP & database CRUD tests (2 tests)
+│   │   ├── test_faults.py        # Deterministic fault injection tests (2 tests)
+│   │   └── test_scenarios_runner.py # Scenario benchmark & trace replay tests (7 tests)
 │   └── unit/
 │       ├── __init__.py
 │       ├── test_config.py        # Settings validation tests (3 tests)
@@ -227,21 +251,26 @@ Execute the automated test suite with pytest:
 pytest -v
 ```
 
-All 91 unit, API, context manager, policy engine, monitoring, and adversarial tests will run in ~0.3 seconds:
+All 109 unit, API, context manager, policy engine, monitoring, adversarial, and simulation sandbox tests will run in ~0.4 seconds:
 
 ```
-collected 91 items
+collected 109 items
 
-tests/api/test_health.py ...                                      [  3%]
-tests/security/test_adversarial.py .............                  [ 17%]
-tests/security/test_context.py ............................       [ 48%]
-tests/security/test_engine.py ...........................         [ 78%]
-tests/security/test_monitoring.py ............                    [ 91%]
-tests/unit/test_config.py ...                                     [ 94%]
-tests/unit/test_database.py ..                                    [ 96%]
+tests/api/test_health.py ...                                      [  2%]
+tests/security/test_adversarial.py .............                  [ 14%]
+tests/security/test_context.py ............................       [ 40%]
+tests/security/test_engine.py ...........................         [ 65%]
+tests/security/test_monitoring.py ............                    [ 76%]
+tests/simulator/test_banking.py ....                              [ 79%]
+tests/simulator/test_faults.py ..                                 [ 81%]
+tests/simulator/test_filesystem.py ...                            [ 84%]
+tests/simulator/test_http_database.py ..                          [ 86%]
+tests/simulator/test_scenarios_runner.py .......                  [ 92%]
+tests/unit/test_config.py ...                                     [ 95%]
+tests/unit/test_database.py ..                                    [ 97%]
 tests/unit/test_logging.py ...                                    [100%]
 
-============================== 91 passed in 0.25s ==============================
+============================== 109 passed in 0.37s ==============================
 ```
 
 ---

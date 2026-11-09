@@ -11,7 +11,7 @@ This document outlines the multi-stage implementation strategy for **AGENTGUARD*
 | **01** | **Project Foundation & Core Architecture** | `backend.core`, `backend.api`, `backend.database`, `tests` | **COMPLETED** |
 | **02** | **Task-Aware Runtime Security & Guardrails** | `backend.security`, Policy Engine, Context Manager | **COMPLETED** |
 | **03** | **Runtime Monitoring Engine & Tool Interception** | `backend.security`, `backend.agent`, Gateway, Interceptor | **COMPLETED** |
-| **04** | **Execution Sandbox & Environment Simulator** | `backend.simulator`, Mock Services, Fault Injection | Scheduled |
+| **04** | **Execution Sandbox & Environment Simulator** | `backend.simulator`, Mock Services, Fault Injection | **COMPLETED** |
 | **05** | **Reliability Scoring, Evaluation & Analytics**| `backend.evaluation`, Benchmarks, Pandas Analysis | Scheduled |
 | **06** | **Operator Observability Dashboard & Hardening**| `dashboard`, Telemetry Stream, UI Controls | Scheduled |
 
@@ -53,12 +53,12 @@ This document outlines the multi-stage implementation strategy for **AGENTGUARD*
 
 ---
 
-### Stage 04 — Execution Sandbox & Environment Simulator
-- [ ] Build Simulation Sandbox: Virtual environments for filesystem, HTTP endpoints, and database operations.
-- [ ] Implement Mock Tool Registry: Synthetic services simulating third-party APIs (e.g., payment gateways, CRM, cloud services).
-- [ ] Deterministic Fault Injection: Simulating network timeouts, corrupted payloads, API rate limits, and 5xx errors.
-- [ ] Adversarial Scenario Generator: Simulating prompt injection payloads, unauthorized file access attempts, and resource exhaustion.
-- [ ] Regression Sandbox Runner: Automated replay of agent execution traces.
+### Stage 04 — Execution Sandbox & Environment Simulator (COMPLETED)
+- [x] Build Simulation Sandbox: Virtual environments for filesystem, HTTP endpoints, and database operations.
+- [x] Implement Mock Tool Registry: Synthetic services simulating accounts, vendors, invoices, payments, and human approval workflow.
+- [x] Deterministic Fault Injection: Simulating network timeouts, corrupted payloads, API rate limits, and 5xx errors.
+- [x] Adversarial Scenario Generator: Standardized scenarios covering prompt injection payloads, unauthorized transfers, approval forgeries, and self-modification.
+- [x] Regression Sandbox Runner: Automated execution and replay of agent action traces with forensic verdict comparison.
 
 ---
 
